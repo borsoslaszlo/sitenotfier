@@ -1,0 +1,57 @@
+queryurl   varchar (200)    primary_key
+queryfrequency  int (minutes)
+emailaddress  varchar (50)
+lastquerydatetime datetime 
+
+
+responsetagname  minden esetben "a"   és a attribútum href   amit keresünk 
+
+
+queryurl  varchar (200)
+resonsetag    		  pl <a>
+responseattribute_filters  pl                  class=="response" && 
+responseattribute_search  pl href    vagy    content_query 
+					ha mondjuk href akkor kikeresi a href attributum értékét ha content akkor a tag-ek között lévő tartalmat
+
+
+vagy esetleg regexp szerű dolog 
+<a class="response" href=""> ldajkldjlajd  </a>
+
+
+
+
+
+queryurl varchar(200)     primary key 
+responseurl varchar (200) primary_key
+sentbymail boolean 
+
+
+
+Hi , 
+
+You results for the query are :
+
+url1
+url2
+url3
+
+
+Regards , 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
