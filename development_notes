@@ -1,17 +1,37 @@
+
+
+queryurl
+
+
+https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/haz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s
+
+https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/sorhaz-ikerhaz-hazresz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s
+
+
 queryurl   varchar (200)    primary_key
 queryfrequency  int (minutes)
 emailaddress  varchar (50)
 lastquerydatetime datetime 
 
+CREATE TABLE queryurls (queryurl text PRIMARYKEY , queryfrequency integer, emailaddress text , lastquerytime text );
+insert into queryurls (queryurl,queryfrequency,emailaddress) values  ('https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/haz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s',1,'borsos.laszlo@gmail.com');
+insert into queryurls (queryurl,queryfrequency,emailaddress) values  ('https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/sorhaz-ikerhaz-hazresz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s',1,'borsos.laszlo@gmail.com');
 
-responsetagname  minden esetben "a"   és a attribútum href   amit keresünk 
 
+
+
+queryurlfilters
 
 queryurl  varchar (200)
-resonsetag    		  pl <a>
+responsetag    		  pl <a>
 responseattribute_filters  pl                  class=="response" && 
-responseattribute_search  pl href    vagy    content_query 
+content_query  boolean 
+
+responseattribute_search  pl href        ha a content_query  false 
 					ha mondjuk href akkor kikeresi a href attributum értékét ha content akkor a tag-ek között lévő tartalmat
+
+CREATE TABLE queryfilters (queryurl text  , querytag text, querytagattributefilters text , contentquery integer , queryattribute text , primary key (queryurl,querytag,querytagattributefilters,contentquery,queryattribute) );
+
 
 
 vagy esetleg regexp szerű dolog 
@@ -20,10 +40,13 @@ vagy esetleg regexp szerű dolog
 
 
 
-
+queryresults
 queryurl varchar(200)     primary key 
-responseurl varchar (200) primary_key
+filteredresult  varchar (200) primary_key
 sentbymail boolean 
+
+CREATE TABLE queryresults (queryurl text  , queryresult  text, sentbyemail integer , primary key (queryurl,queryresult) );
+
 
 
 
@@ -37,6 +60,15 @@ url3
 
 
 Regards , 
+
+
+
+
+
+
+
+
+
 
 
 
