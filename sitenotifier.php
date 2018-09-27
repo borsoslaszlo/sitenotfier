@@ -9,6 +9,36 @@ class  SiteNotifierDB  extends SQLite3
 }
 
 
+class Parameters {
+    
+    public static $checkinterval =60;  //in seconds
+}
+
+
+class MailAttrs 
+{
+    private static $addresse;
+    private static $subject;
+    private static $text;
+    
+    static function __construct($par_addresse,$par_subject){
+        self::$addresse=$par_addresse;
+        self::$subject=$par_subject;
+    }
+    
+    static function  addText ($par_txt) {
+        self::$text = self::$text + $par_txt;
+    }
+    
+    static function getText () {
+        return self::$text ;
+    }
+    
+}
+
+
+
+
 $db= new SiteNotifierDB();
 
 
@@ -39,10 +69,10 @@ function my_curl_close ($ch)
 function countrows ($par_url,$par_result,$par_db)
 
 {
-    $query = 'select count (*) as sum  from  queryresults where queryurl = \''.$par_url.'\' and queryresult = \''.$par_result.'\'';
+    $query = 'select count(*) as sumresults  from  queryresults where queryurl = \''.$par_url.'\' and queryresult = \''.$par_result.'\'';
     $result = $par_db->query ($query);
     while ($row = $result->fetchArray (SQLITE3_ASSOC)){
-        $count = $row['sum'];
+        $count = $row['sumresults'];
     }
     
     return $count;
@@ -55,100 +85,138 @@ function countrows ($par_url,$par_result,$par_db)
 
 while (true) {
 
-    $result = $db->query('select queryfilters.queryurl as url , queryurls.queryfrequency , queryurls.emailaddress  , queryurls.lastquerytime   from queryfilters  join queryurls  on queryfilters.queryurl = queryurls.queryurl');
+    //$result = $db->query('select queryfilters.queryurl as url , queryurls.queryfrequency , queryurls.emailaddress  , queryurls.lastquerytime   from queryfilters  join queryurls  on queryfilters.queryurl = queryurls.queryurl');
     
-    //$result_array = $result->fetchArray(SQLITE3_ASSOC);
+    $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytime  from queryurls');
     
+    //$result_array = $result_main->fetchArray(SQLITE3_ASSOC);
     //var_dump($result_array);
     
     
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+    
+    
+    
+    while ($row = $result_main->fetchArray(SQLITE3_ASSOC)) {
          $url = $row['url'];
             echo $url."\n";
     
-        
-          $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , queryattribute  from queryfilters  where queryurl=\''.$url.'\'');
-            
-          while ($attributerow = $attributeresult->fetchArray(SQLITE3_ASSOC)){
-            $querytag= $attributerow ['querytag'];
-            $tagfilterattribute= $attributerow ['querytagattributefilters'];
-            $contentquery = $attributerow ['contentquery'];
-            $contentqueryattribute =  $attributerow ['queryattribute'];
-            
-              $attribute_filter  = split ('=',$tagfilterattribute);
-            
-              echo "URL:".$url."\n";
-              echo "Querytag:".$querytag."\n";
-              echo "Tagfilterattribute:".$tagfilterattribute."\n";
-              echo "    ".$attribute_filter[0]."\n";
-              echo "    ".$attribute_filter[1]."\n";
-              
-              echo "Is contentguery?:".$contentquery."\n";
-              echo "Contentqueryattribute:".$contentqueryattribute."\n";
-            
-            
-            
-            
-            
-            $curlch= my_curl_init($url);            
-            $html = curl_exec($curlch);
-            
-            
-            
-            
-            
-            # Create a DOM parser object
-            $dom = new DOMDocument();
-            
-            # Parse the HTML from Google.
-            # The @ before the method call suppresses any warnings that
-            # loadHTML might throw because of invalid HTML in the page.
-            @$dom->loadHTML($html);
-            
-            foreach($dom->getElementsByTagName($querytag) as $link) {
-                # Show the <a href>
-                //echo $link->getAttribute ('class');
-                if ($link->getAttribute ($attribute_filter[0]) == $attribute_filter[1]){
-                    
-                    
-                    if ($contentquery){
-                        echo $link ."\n";
-                        countrows($url, $link, $db);
-                        
-                        
-                        
-                        
-                        
-                    } else {
-                        echo $link->getAttribute($contentqueryattribute)."\n";
-                    }
-                }
                 
-            }
-            my_curl_close($curlch);
-              
-              
-          }
-          
-          
+          $lastquerytime= $row['lastquerytime'];
+          $queryfrequency = $row ['queryfrequency'];   //minute
+          $actualtimestamp = time();
+          $lastquerytimestamp  = strtotime($lastquerytime);
+
+          if ($actualtimestamp-$lastquerytimestamp > $queryfrequency*60 ) {
             
-        
-         $created_date = date('Y-m-d H:i:s');
-         echo $created_date."\n";
-         
-         $update_cmd = 'update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\' '.$url .'\'';
-         echo $update_cmd."\n";
-         
-         //$suc=$db->exec('update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\''.$url .'\'');
-         $suc=$db-> exec ($update_cmd);
-         echo $suc."\n";
+              $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , queryattribute  from queryfilters  where queryurl=\''.$url.'\'');
+                
+              while ($attributerow = $attributeresult->fetchArray(SQLITE3_ASSOC)){
+                $querytag= $attributerow ['querytag'];
+                $tagfilterattribute= $attributerow ['querytagattributefilters'];
+                $contentquery = $attributerow ['contentquery'];
+                $contentqueryattribute =  $attributerow ['queryattribute'];
+                
+                  $attribute_filter  = split ('=',$tagfilterattribute);
+                
+                  echo "URL:".$url."\n";
+                  echo "Querytag:".$querytag."\n";
+                  echo "Tagfilterattribute:".$tagfilterattribute."\n";
+                  echo "    ".$attribute_filter[0]."\n";
+                  echo "    ".$attribute_filter[1]."\n";
+                  
+                  echo "Is contentguery?:".$contentquery."\n";
+                  echo "Contentqueryattribute:".$contentqueryattribute."\n";
+                
+                
+                
+                
+                
+                $curlch= my_curl_init($url);            
+                $html = curl_exec($curlch);
+                
+                
+                
+                
+                
+                # Create a DOM parser object
+                $dom = new DOMDocument();
+                
+                # Parse the HTML from Google.
+                # The @ before the method call suppresses any warnings that
+                # loadHTML might throw because of invalid HTML in the page.
+                @$dom->loadHTML($html);
+                
+                foreach($dom->getElementsByTagName($querytag) as $link) {
+                    # Show the <a href>
+                    //echo $link->getAttribute ('class');
+                    if ($link->getAttribute ($attribute_filter[0]) == $attribute_filter[1]){
+                        
+                        
+                        if ($contentquery){
+                            echo $link ."\n";
+                            
+                            $matches = array();
+                            
+                            preg_match_all('/<'.$querytag.' .*?>(.*?)<\/'.$querytag.'>/',$link,$matches);
+                                                    
+                            if (countrows($url, $matches [1] [0], $db) == 0 ){
+                                $stmt = $db->prepare ('INSERT INTO queryresults ( queryurl, queryresult, sentbyemail ) VALUES (:parqurl,:parqresult,:parqsentbymail)');
+                                $stmt->bindValue(':parqurl', $url,  SQLITE3_TEXT);
+                                $stmt->bindValue(':parqresult', $matches [1] [0],  SQLITE3_TEXT);
+                                $stmt->bindValue(':parqsentbymail', 0,  SQLITE3_INTEGER);
+                                $result=$stmt->execute();
+                            }
+                            
+                        } else {
+                            $result = $link->getAttribute($contentqueryattribute);
+                            if (countrows($url, $result, $db) == 0 ){
+                                $stmt = $db->prepare ('INSERT INTO queryresults ( queryurl, queryresult, sentbyemail) VALUES (:parqurl,:parqresult,:parqsentbymail)');
+                                $stmt->bindValue(':parqurl', $url,  SQLITE3_TEXT);
+                                $stmt->bindValue(':parqresult', $result,  SQLITE3_TEXT);
+                                $stmt->bindValue(':parqsentbymail', 0,  SQLITE3_INTEGER);
+                                $result=$stmt->execute();
+                            }
+                        }
+                    }
+                    
+                }
+                my_curl_close($curlch);
+                  
+                  
+              }
+                           
+             //mailing part on the not sent results
+             
+             //construct the mail text
+            
+              
+              
+              
+              
+              
+              
+              
+              
+                
+            
+             $created_date = date('Y-m-d H:i:s');
+             echo $created_date."\n";
+             
+             $update_cmd = 'update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\' '.$url .'\'';
+             echo $update_cmd."\n";
+             
+             //$suc=$db->exec('update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\''.$url .'\'');
+             $suc=$db-> exec ($update_cmd);
+             echo $suc."\n";
+             
+        }
          
     }
     
     
     echo "------------------------------------------------_";
     
-    sleep(60);
+    sleep(Parameters::$checkinterval);
     
 }
 
