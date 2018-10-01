@@ -244,6 +244,10 @@ while (true) {
         while ($resulturlsrow = $resulturls->fetchArray(SQLITE3_ASSOC)){
             Mailing::addText($resulturlsrow ['queryresult']."\n");
             //echo ($resulturlsrow ['queryresult']."\n");
+            
+            
+            $db->exec ('update queryresults set sentbyemail=1 where queryurl =\''.$url .'\' AND queryresult = \''.$resulturlsrow ['queryresult'].'\'');
+            
         }
         Mailing::setSubject("Results of url : ".$url);
         Mailing::setAddresse($emailaddress);
