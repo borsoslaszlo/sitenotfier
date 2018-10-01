@@ -15,20 +15,54 @@ class Parameters {
 }
 
 
-class MailAttrs 
+class Mailing
 {
-    private static $addresse;
+    private static $addresses=array();
     private static $subject;
     private static $text;
     
-    static function __construct($par_addresse,$par_subject){
-        self::$addresse=$par_addresse;
-        self::$subject=$par_subject;
-    }
+//     static function __construct($par_addresse,$par_subject){
+//         self::$addresse=$par_addresse;
+//         self::$subject=$par_subject;
+//     }
     
     static function  addText ($par_txt) {
-        self::$text = self::$text + $par_txt;
+        self::$text = self::$text . $par_txt ;
     }
+    
+    static function  addAddresse ($par_addresse){
+       array_push(self::$addresses, $par_addresse);
+    }
+    
+    static function setAddresse ($par_addresse)
+    {
+      self::$addresses=array();
+      array_push(self::$addresses, $par_addresse);
+    }
+    
+    static function setSubject ($par_subject) 
+    {
+        self::$subject = $par_subject;
+    }
+    
+    static function sendMails (){
+        foreach (self::$addresses as $address) {
+            
+            if (mail($address, self::$subject, self::$text)){
+                echo ("Mail has been sent with the following datas:\n");
+                echo ("Addresse: ".$address."\n");
+                echo ("Subject:".self::$subject."\n");
+                echo ("Text: ".self::$text."\n");
+            }
+            else {
+                echo ("There was problem in sending mail.\n");
+            }
+          
+        }
+        
+    }
+        
+    
     
     static function getText () {
         return self::$text ;
@@ -87,7 +121,7 @@ while (true) {
 
     //$result = $db->query('select queryfilters.queryurl as url , queryurls.queryfrequency , queryurls.emailaddress  , queryurls.lastquerytime   from queryfilters  join queryurls  on queryfilters.queryurl = queryurls.queryurl');
     
-    $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytime  from queryurls');
+    $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytime ,emailaddress from queryurls');
     
     //$result_array = $result_main->fetchArray(SQLITE3_ASSOC);
     //var_dump($result_array);
@@ -105,7 +139,8 @@ while (true) {
           $queryfrequency = $row ['queryfrequency'];   //minute
           $actualtimestamp = time();
           $lastquerytimestamp  = strtotime($lastquerytime);
-
+          $emailaddress = $row ['emailaddress'];
+          
           if ($actualtimestamp-$lastquerytimestamp > $queryfrequency*60 ) {
             
               $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , queryattribute  from queryfilters  where queryurl=\''.$url.'\'');
@@ -116,27 +151,18 @@ while (true) {
                 $contentquery = $attributerow ['contentquery'];
                 $contentqueryattribute =  $attributerow ['queryattribute'];
                 
-                  $attribute_filter  = split ('=',$tagfilterattribute);
+                $attribute_filter  = split ('=',$tagfilterattribute);
                 
-                  echo "URL:".$url."\n";
-                  echo "Querytag:".$querytag."\n";
-                  echo "Tagfilterattribute:".$tagfilterattribute."\n";
-                  echo "    ".$attribute_filter[0]."\n";
-                  echo "    ".$attribute_filter[1]."\n";
-                  
-                  echo "Is contentguery?:".$contentquery."\n";
-                  echo "Contentqueryattribute:".$contentqueryattribute."\n";
-                
-                
-                
-                
+                echo "URL:".$url."\n";
+                echo "Querytag:".$querytag."\n";
+                echo "Tagfilterattribute:".$tagfilterattribute."\n";
+                echo "    ".$attribute_filter[0]."\n";
+                echo "    ".$attribute_filter[1]."\n";
+                echo "Is contentguery?:".$contentquery."\n";
+                echo "Contentqueryattribute:".$contentqueryattribute."\n";
                 
                 $curlch= my_curl_init($url);            
                 $html = curl_exec($curlch);
-                
-                
-                
-                
                 
                 # Create a DOM parser object
                 $dom = new DOMDocument();
@@ -188,16 +214,10 @@ while (true) {
              //mailing part on the not sent results
              
              //construct the mail text
-            
+         
               
               
               
-              
-              
-              
-              
-              
-                
             
              $created_date = date('Y-m-d H:i:s');
              echo $created_date."\n";
@@ -209,7 +229,33 @@ while (true) {
              $suc=$db-> exec ($update_cmd);
              echo $suc."\n";
              
+        
+             
+             
+             
+             
+             
+             
         }
+        //send the mail
+        
+        echo $url."\n";
+        $resulturls = $db->query ('select queryresult from queryresults where queryurl=\''.$url.'\' and sentbyemail=0');
+        while ($resulturlsrow = $resulturls->fetchArray(SQLITE3_ASSOC)){
+            Mailing::addText($resulturlsrow ['queryresult']."\n");
+            //echo ($resulturlsrow ['queryresult']."\n");
+        }
+        Mailing::setSubject("Results of url : ".$url);
+        Mailing::setAddresse($emailaddress);
+        //echo (Mailing::getText());
+        
+        Mailing::sendMails();
+        
+        
+        
+        
+        
+        
          
     }
     
