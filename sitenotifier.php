@@ -132,7 +132,7 @@ while (true) {
     
     while ($row = $result_main->fetchArray(SQLITE3_ASSOC)) {
          $url = $row['url'];
-            echo $url."\n";
+            //echo $url."\n";
     
                 
           $lastquerytime= $row['lastquerytime'];
@@ -151,8 +151,9 @@ while (true) {
                 $contentquery = $attributerow ['contentquery'];
                 $contentqueryattribute =  $attributerow ['queryattribute'];
                 
-                $attribute_filter  = split ('=',$tagfilterattribute);
+                $attribute_filter  = explode('=',$tagfilterattribute);
                 
+                echo "Timestamp:".  date('Y-m-d H:i:s',$actualtimestamp)."\n";
                 echo "URL:".$url."\n";
                 echo "Querytag:".$querytag."\n";
                 echo "Tagfilterattribute:".$tagfilterattribute."\n";
@@ -179,7 +180,7 @@ while (true) {
                         
                         
                         if ($contentquery){
-                            echo $link ."\n";
+                            //echo $link ."\n";
                             
                             $matches = array();
                             
@@ -220,14 +221,14 @@ while (true) {
               
             
              $created_date = date('Y-m-d H:i:s');
-             echo $created_date."\n";
+             //echo $created_date."\n";
              
              $update_cmd = 'update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\' '.$url .'\'';
-             echo $update_cmd."\n";
+             //echo $update_cmd."\n";
              
              //$suc=$db->exec('update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\''.$url .'\'');
              $suc=$db-> exec ($update_cmd);
-             echo $suc."\n";
+             //echo $suc."\n";
              
         
              
@@ -239,9 +240,15 @@ while (true) {
         }
         //send the mail
         
-        echo $url."\n";
+        //echo $url."\n";
         $resulturls = $db->query ('select queryresult from queryresults where queryurl=\''.$url.'\' and sentbyemail=0');
+        
+        //var_dump($resulturls);
+        
+        $numrows=0;
         while ($resulturlsrow = $resulturls->fetchArray(SQLITE3_ASSOC)){
+            $numrows++;
+            
             Mailing::addText($resulturlsrow ['queryresult']."\n");
             //echo ($resulturlsrow ['queryresult']."\n");
             
@@ -249,12 +256,17 @@ while (true) {
             $db->exec ('update queryresults set sentbyemail=1 where queryurl =\''.$url .'\' AND queryresult = \''.$resulturlsrow ['queryresult'].'\'');
             
         }
+        
+        //echo ("------------------------------------"\n");
+        
+        if ($numrows != 0 ){
         Mailing::setSubject("Results of url : ".$url);
         Mailing::setAddresse($emailaddress);
         //echo (Mailing::getText());
         
         Mailing::sendMails();
         
+        }
         
         
         
@@ -264,7 +276,7 @@ while (true) {
     }
     
     
-    echo "------------------------------------------------_";
+    echo "---------------------------------------------------------------------\n";
     
     sleep(Parameters::$checkinterval);
     
