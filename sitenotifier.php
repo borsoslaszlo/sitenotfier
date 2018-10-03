@@ -117,7 +117,7 @@ function countrows ($par_url,$par_result,$par_db)
 
 
 
-while (true) {
+//while (true) {   // if it is started from crontab not necessary
 
     //$result = $db->query('select queryfilters.queryurl as url , queryurls.queryfrequency , queryurls.emailaddress  , queryurls.lastquerytime   from queryfilters  join queryurls  on queryfilters.queryurl = queryurls.queryurl');
     
@@ -278,9 +278,9 @@ while (true) {
     
     echo "---------------------------------------------------------------------\n";
     
-    sleep(Parameters::$checkinterval);
+//    sleep(Parameters::$checkinterval);  // if it is started from crontab
     
-}
+//}  // while (true )
 
 
 // $result = $db->query('SELECT * FROM queryurls');
