@@ -222,13 +222,20 @@ function countrows ($par_url,$par_result,$par_db)
             
              $created_date = date('Y-m-d H:i:s');
              //echo $created_date."\n";
+
              
-             $update_cmd = 'update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\' '.$url .'\'';
-             //echo $update_cmd."\n";
+             $stmt = $db->prepare ('UPDATE queryurls SET lastquerytime=:parcreatedtime WHERE queryurl=:parqurl');
+             $stmt->bindValue(':parqurl', $url,  SQLITE3_TEXT);
+             $stmt->bindValue(':parcreatedtime', $created_date,  SQLITE3_TEXT);
+             $stmt->execute();
+             
+             
+             //$update_cmd = 'update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\' '.$url .'\'';
+             
              
              //$suc=$db->exec('update queryurls set lastquerytime=\''.$created_date.'\' where queryurl=\''.$url .'\'');
-             $suc=$db-> exec ($update_cmd);
-             //echo $suc."\n";
+             //$db-> exec ($update_cmd);
+             
              
         
              
