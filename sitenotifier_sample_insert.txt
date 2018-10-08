@@ -1,0 +1,20 @@
+
+
+
+A content query 1 ha pl. ebben az esetben az egész <a> tartalmát akarjuk , nemcsak a href részét , tehát 
+ha nem akarunk attribute -ra még szűrni az a ban .
+
+Ez a példa konkrétan kiszűri a HTML -ből   azokat az <a> elemeket amelyeknek a CSS osztályuk subject 
+(class='subject') és abból kiveszi a href attribute tartalmát . 
+
+
+
+
+INSERT INTO queryurls (queryurl , queryfrequency, emailaddress ,lastquerytime)
+	VALUES ('https://https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/haz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s',1,'borsos.laszlo@gmail.com','2000-01-01 00:00:400')
+
+
+INSERT INTO  queryfilters (queryurl , querytag , querytagattributefilters , contentquery , queryattribute  ) 
+	VALUES ('https://ingatlan.jofogas.hu/fejer/szekesfehervar/20-km/haz/jo-allapotu+uj-epitesu/garazsban+udvarban?st=s','a','class=subject',0,'href')
+
+
