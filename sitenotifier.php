@@ -1,10 +1,14 @@
 <?php
 
+
+
+
+
 class  SiteNotifierDB  extends SQLite3
 {
-    function __construct()
+    function __construct($par_sqlitedbpath)
     {
-        $this->open('sitenotifier.db');
+        $this->open($par_sqlitedbpath);
     }
 }
 
@@ -73,7 +77,7 @@ class Mailing
 
 
 
-$db= new SiteNotifierDB();
+$db= new SiteNotifierDB($argv[1]);
 
 
 
@@ -141,7 +145,15 @@ function countrows ($par_url,$par_result,$par_db)
           $lastquerytimestamp  = strtotime($lastquerytime);
           $emailaddress = $row ['emailaddress'];
           
-          if ($actualtimestamp-$lastquerytimestamp > $queryfrequency*60 ) {
+          echo "URL:".$row['url'] . "\n";
+                    
+          echo "Actual timestamp:".$actualtimestamp."\n";
+          echo "Last query timestamp:".$lastquerytimestamp."\n";
+          echo "Difference of timestamps:".($actualtimestamp-$lastquerytimestamp)." seconds.\n";
+          echo "Set queryfrequency is :".($queryfrequency*60)." seconds.\n";
+          
+          
+          if (($actualtimestamp-$lastquerytimestamp) > $queryfrequency*60 ) {
             
               $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , queryattribute  from queryfilters  where queryurl=\''.$url.'\'');
                 
