@@ -155,13 +155,15 @@ function countrows ($par_url,$par_result,$par_db)
           
           if (($actualtimestamp-$lastquerytimestamp) > $queryfrequency*60 ) {
             
-              $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , queryattribute  from queryfilters  where queryurl=\''.$url.'\'');
+              $attributeresult  = $db->query ('select queryurl  , querytag , querytagattributefilters  , contentquery  , textbefore ,queryattribute , textafter   from queryfilters  where queryurl=\''.$url.'\'');
                 
               while ($attributerow = $attributeresult->fetchArray(SQLITE3_ASSOC)){
                 $querytag= $attributerow ['querytag'];
                 $tagfilterattribute= $attributerow ['querytagattributefilters'];
                 $contentquery = $attributerow ['contentquery'];
                 $contentqueryattribute =  $attributerow ['queryattribute'];
+                $textbefore = $attributerow ['textbefore'];
+                $textafter = $attributerow ['textafter'];
                 
                 $attribute_filter  = explode('=',$tagfilterattribute);
                 
@@ -197,17 +199,27 @@ function countrows ($par_url,$par_result,$par_db)
                             $matches = array();
                             
                             preg_match_all('/<'.$querytag.' .*?>(.*?)<\/'.$querytag.'>/',$link,$matches);
-                                                    
+                                             
+                            $result = $matches [1] [0];
+
+                            if (!empty($textbefore))  {$result=$textbefore.$result;}
+                            if (!empty($textafter))  {$result=$result.$textafter;}
+                            
+                            
+                            
                             if (countrows($url, $matches [1] [0], $db) == 0 ){
                                 $stmt = $db->prepare ('INSERT INTO queryresults ( queryurl, queryresult, sentbyemail ) VALUES (:parqurl,:parqresult,:parqsentbymail)');
                                 $stmt->bindValue(':parqurl', $url,  SQLITE3_TEXT);
-                                $stmt->bindValue(':parqresult', $matches [1] [0],  SQLITE3_TEXT);
+                                $stmt->bindValue(':parqresult', $result,  SQLITE3_TEXT);
                                 $stmt->bindValue(':parqsentbymail', 0,  SQLITE3_INTEGER);
                                 $result=$stmt->execute();
                             }
                             
                         } else {
                             $result = $link->getAttribute($contentqueryattribute);
+                            if (!empty($textbefore))  {$result=$textbefore.$result;}
+                            if (!empty($textafter))  {$result=$result.$textafter;}
+                            
                             if (countrows($url, $result, $db) == 0 ){
                                 $stmt = $db->prepare ('INSERT INTO queryresults ( queryurl, queryresult, sentbyemail) VALUES (:parqurl,:parqresult,:parqsentbymail)');
                                 $stmt->bindValue(':parqurl', $url,  SQLITE3_TEXT);
