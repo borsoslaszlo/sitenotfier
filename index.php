@@ -28,6 +28,8 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
     <body>
     <div class="container-fluid">
     	<div class="row">
+    	<div class="col-3"></div>
+    	<div class="col-6">
 			<form action="">    	
         		<div class="form-group">
         			<label for="queryurl">Query URL:</label>
@@ -47,13 +49,32 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
         			
         		</div>
         		<div class="form-group">
-        			<label for="queryfrequency">Query frequency (min):</label>
-        			<input type="number" class="form-control" placeholder="1" step ="1" min="1">
+        			<label for="queryfrequency">Query frequency (minute):</label>
+        			<input id="queryfrequency" type="number" class="form-control" placeholder="1" step ="1" min="1">
         		</div>
+        		<div class="form-group">
+        			<label for="email">E-mail: </label>
+        			<input id="email" type="email" class="form-control" placeholder="debil.denes@gmail.com" >
+        		</div>
+        		
+        		<div class="form-group">
+        			<label for="querytag">Querytag: </label>
+        			<input id="querytag" type="text" class="form-control" placeholder="a" >
+        			<small id="querytaghelp" class="form-text text-muted">Eg.  a  for searching   &lt;a&gt;   tags in page.  </small>
+        		</div>
+        		
+        		<div class="form-group">
+        			<label for="queryattributefilter">Querytag: </label>
+        			<input id="queryattributefilter" type="text" class="form-control" placeholder="class=result" >
+        			<small id="queryattributefilterhelp" class="form-text text-muted">Eg.  a  for searching   &lt;a&gt;   tags  with class="result"  attribute in page.  </small>
+        		</div>
+        		
+        		
         		
         	</form>
     	</div>
-    
+    	<div class="col-3"></div>
+    </div>
     
     <?php
     echo "klklk";
