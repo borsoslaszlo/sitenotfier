@@ -17,6 +17,7 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
 ?>
 
 
+
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title hereaaaaa</title>
@@ -24,6 +25,11 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" href="css/bootstrap.min.css" >
 <script src="js/bootstrap.min.js" ></script>
+<script src="js/functions.js" ></script>
+<script src="js/jquery-3.3.1.min.js" ></script>
+
+
+
 
     <body>
     <div class="container-fluid">
@@ -33,7 +39,7 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
 			<form action="">    	
         		<div class="form-group">
         			<label for="queryurl">Query URL:</label>
-        			<input type="url" id="queryurl" class="form-control" placeholder="http://company.com/query.php?a=1&b=2"  list="queryurls">
+        			<input type="url" id="queryurl" class="form-control" placeholder="http://company.com/query.php?a=1&b=2"  list="queryurls" onchange="addURLItemsToView  ($('#queryurl').val())">
 					<datalist id="queryurls">
 					
 					
@@ -75,6 +81,7 @@ $result_main = $db->query('select queryurl as url ,queryfrequency , lastquerytim
     	</div>
     	<div class="col-3"></div>
     </div>
+    
     
     <?php
     echo "klklk";
