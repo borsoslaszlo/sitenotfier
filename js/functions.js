@@ -13,36 +13,31 @@ function getURLItems (parUrl)
 	$.post ("getURLItems.php",{parameterjson:JSON.stringify (queryurljson)})
 	.done (function (data)
 			{
-			//alert (data);
-			a =  JSON.stringify (data);
-			
+			$("#tagtable").remove ();
+			$("body").append (convertJSONToTable (data));
 			}
 			);
 
-return a;	
 }
+
 
 
 function convertJSONToTable (rowsStringArray)
 {
 	
+	//input like    {"a":"a","b":"b"};{"a":"c","b":"d"}    ; separated JSONs as string  
+	//output a HTML table 
 	
-
-	var rowsArray= rowsStringArray.split(',');  
-
+	var rowsArray= rowsStringArray.split(';');  
 	var arHeader = [];
 	var arRows = [];
-	
-	
-	
-	
-	rowsArray.forEach (function (index,value,array)
+	rowsArray.forEach (function (row ,index,array)
 			{
-	
+			
 			var strFields = [];
-			$.each (value, function (index,value)
+			$.each (JSON.parse(row), function (index,value)
 					{
-					if  (arHeader.indexOf (index) ===0 )
+					if  (arHeader.indexOf (index) === -1 )
 						{
 							arHeader.push (index);
 						}
@@ -50,20 +45,14 @@ function convertJSONToTable (rowsStringArray)
 					});
 			arRows.push (strFields);
 			});	
-
 	
-		
-	
-	
-	
-	
-	var htmltable ='<table class="table">';
+	var htmltable ='<table class="table" id="tagtable">';
 	htmltable +=  '<thead>';
 	htmltable +=  '<tr>';
 
-	arHeader.forEach (function (index, value , array )
+	arHeader.forEach (function (value, index , array )
 			{
-				htmltable +=  '<th scope="col">' + index+ '</th>' ;
+				htmltable +=  '<th scope="col">' + value+ '</th>' ;
 			}
 			);
 	
@@ -72,39 +61,25 @@ function convertJSONToTable (rowsStringArray)
 	htmltable +=  '<tbody>';
 	
 	
-	arRows.forEach (function (index,value,array)
+	arRows.forEach (function (value,indey,array)
 			{
 				htmltable +=  '<tr>';
-				value.forEach (function (index,value,array)
+				value.forEach (function (value,index,array)
 						{
 						htmltable +=  '<td>'+ value + '</td>';
 						});
+				htmltable +=  '<td>'+ '<img src="img/minus-circle.svg" style ="	height:20px; width:20px;">' + '</td>';
 				htmltable +=  '</tr>';
 		
 			});
 	htmltable +=  '</tbody>';
 	htmltable +=  '</table>';
-	
-	
-
 	return htmltable;
 }
 		
  
 
 
-
-function addURLItemsToView (parUrl)
-{
-	var strJsonItems   = getURLItems(parUrl) ;
-	alert (strJsonItems);
-	var tablehtml= convertJSONToTable (strJsonItems);
-	$("body").append (tablehtml)  ;
-	
-	
-	
-	
-}
 
 
 

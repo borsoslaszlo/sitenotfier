@@ -1,7 +1,6 @@
 <?php
 
 
-
 class  SiteNotifierDB  extends SQLite3
 {
     function __construct($par_sqlitedbpath)
@@ -39,7 +38,7 @@ while ($row = $result_main->fetchArray(SQLITE3_ASSOC)) {
     
  }
 
-echo implode(",", $results); 
+echo implode(";", $results); 
  
  
 ?>
