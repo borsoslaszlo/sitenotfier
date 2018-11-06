@@ -6,6 +6,7 @@ class RecordOperations   /*Singleton*/
     private static $tableName;
     
     private  static $arOldTableFields=array();
+    
 
     
     private function init ()
@@ -77,7 +78,7 @@ class RecordOperations   /*Singleton*/
         return  "INSERT INTO ". self::$tableName ." " . $fieldNames ." " ."VALUES ".  " ".  $fieldValues;
     }
     
-    public  static function  updateRecord ($objectOld,$objectNew)
+    public  static function  changeRecord ($objectOld,$objectNew)
     {
         self::init($objectOld,$objectNew);
         
@@ -86,17 +87,30 @@ class RecordOperations   /*Singleton*/
         
         foreach (self::$arNewTableFields as $key=>$value)
         {
-                echo $key;
-                echo $value . "\n";
-            $newValues = $newValues . $key . "=" . (gettype($value) === "string")?"'":"" . $value .  (gettype($value) === "string")?"'":"" . ",";
+            //$newValues = $newValues . $key . "=" . (gettype($value) == "string")? $newValues = $newValues . "'"  :  $newValues = $newValues ." " .   $value . (gettype($value) == "string")? $newValues = $newValues . "'"  :  $newValues = $newValues ." " . ",";
+            
+            $newValues = $newValues . $key . "="  ;
+            if (gettype($value) == "string") $newValues =  $newValues . "'";
+            $newValues = $newValues . $value ;
+            if (gettype($value) == "string") $newValues =  $newValues . "'";
+            $newValues = $newValues . ",";
+            
+            
+            
+            
         }
         
         foreach (self::$arOldTableFields as $key=>$value)
         {
-            echo $key;
-            echo $value ;
             
-            $oldValues = $oldValues . $key . "=" . (gettype($value) === "string")?"'":"" . $value .  (gettype($value) === "string")?"'":"" . " AND ";
+            //$oldValues = $oldValues . $key . "=" . (gettype($value) === "string")?"'":"" . $value .  (gettype($value) === "string")?"'":"" . " AND ";
+            $oldValues = $oldValues . $key . "=" ;
+            if (gettype($value) == "string") $oldValues = $oldValues ."'";
+            $oldValues = $oldValues .$value;
+            if (gettype($value) == "string") $oldValues = $oldValues ."'";
+            $oldValues = $oldValues . " AND ";
+            
+            
         }
         
         
@@ -106,6 +120,37 @@ class RecordOperations   /*Singleton*/
         
         return "UPDATE " . self::$tableName . " SET "  . $newValues .  " WHERE " . $oldValues; 
     }
+    
+    
+    public  static function  deleteRecord ($objectOld)
+    {
+        
+        $oldValues = "";
+        foreach (self::$arOldTableFields as $key=>$value)
+        {
+            
+            //$oldValues = $oldValues . $key . "=" . (gettype($value) === "string")?"'":"" . $value .  (gettype($value) === "string")?"'":"" . " AND ";
+            $oldValues = $oldValues . $key . "=" ;
+            if (gettype($value) == "string") $oldValues = $oldValues ."'";
+            $oldValues = $oldValues .$value;
+            if (gettype($value) == "string") $oldValues = $oldValues ."'";
+            $oldValues = $oldValues . " AND ";
+            
+            
+        }
+        
+        $oldValues = rtrim ($oldValues , " AND ");   
+        
+        return "DELETE FROM " . self::$tableName . " WHERE " . $oldValues;
+        
+    }
+    
+    
+    
+    
+    
+    
+    
     
     
     
